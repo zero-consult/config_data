@@ -1,0 +1,37 @@
+services:
+  people-frontend:
+    image: docker-releases/people_frontend_development:1.0.26
+    networks:
+      - development
+    hostname: people-frontend
+    ports:
+      - 5173:5173
+    environment:
+      VITE_PEOPLE_BACKEND_HOST: https://people-backend:8080
+  people-backend:
+    image: docker-releases/people_backend_development:1.0.6
+    networks:
+      - development
+    hostname: people-backend
+    ports:
+      - 8080:8080
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: people_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  postgres:
+    image: postgres:latest
+    networks:
+      - development
+    shm_size: 128mb
+    hostname: postgres
+    environment:
+      POSTGRES_DB: people_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+networks:
+  development:
+    driver: bridge
+
