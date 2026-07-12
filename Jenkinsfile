@@ -4,14 +4,22 @@ pipeline {
         stage('Undeploy previous services') {
             steps {
                 catchError(buildResult: 'SUCCESS', stageResult: 'FAILURE') {
-                    sh "docker compose -f compose.yaml down"
+                    script {
+                        docker.withRegistry('http://nexus:8081', 'Nexus') {
+                            sh(returnStdout: true, script: "docker compose -f compose.yaml down")
+                        }
+                    }
                 }
             }
         }
         stage('Deploy services') {
             steps {
                 withCredentials([string(credentialsId: 'PostgresPassword', variable: 'POSTGRES_PASSWORD')]) {
-                    sh "docker compose -f compose.yaml up"
+                    script {
+                        docker.withRegistry('http://nexus:8081', 'Nexus') {
+                            sh(returnStdout: true, script: "docker compose -f compose.yaml up")
+                        }
+                    }
                 }
             }
         }
