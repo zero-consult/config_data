@@ -6,9 +6,9 @@ services:
       - development
     hostname: people-frontend
     ports:
-      - 5173:5173
+      - 5100:5173
     environment:
-      VITE_PEOPLE_BACKEND_HOST: http://people-backend:8080
+      VITE_PEOPLE_BACKEND_HOST: http://localhost:4000
   people-backend:
     container_name: people-backend
     image: nexus:8081/docker-releases/people_backend_development:1.0.13
@@ -16,7 +16,7 @@ services:
       - development
     hostname: people-backend
     ports:
-      - 8080:8080
+      - 4000:8080
     environment:
       POSTGRES_HOST: postgres
       POSTGRES_PORT: 5432
