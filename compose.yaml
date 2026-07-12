@@ -30,6 +30,8 @@ services:
       - development
     shm_size: 128mb
     hostname: postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
     environment:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
