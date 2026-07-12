@@ -17,7 +17,7 @@ pipeline {
                 withCredentials([string(credentialsId: 'PostgresPassword', variable: 'POSTGRES_PASSWORD')]) {
                     script {
                         docker.withRegistry('http://nexus:8081', 'Nexus') {
-                            sh(returnStdout: true, script: "docker compose -d -f compose.yaml up")
+                            sh(returnStdout: true, script: "docker compose -f compose.yaml up -d")
                         }
                     }
                 }
