@@ -1,6 +1,6 @@
 services:
   people-frontend:
-    image: docker-releases/people_frontend_development:1.0.26
+    image: docker-releases/people_frontend_development:1.0.27
     networks:
       - development
     hostname: people-frontend
