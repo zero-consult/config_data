@@ -9,7 +9,7 @@ services:
     environment:
       VITE_PEOPLE_BACKEND_HOST: https://people-backend:8080
   people-backend:
-    image: docker-releases/people_backend_development:1.0.6
+    image: docker-releases/people_backend_development:1.0.13
     networks:
       - development
     hostname: people-backend

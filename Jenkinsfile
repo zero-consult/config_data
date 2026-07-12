@@ -10,7 +10,9 @@ pipeline {
         }
         stage('Deploy services') {
             steps {
-                sh "docker compose -f compose.yaml up"
+                withCredentials([string(credentialsId: 'postgresPassword', variable: 'POSTGRES_PASSWORD')]) {
+                    sh "docker compose -f compose.yaml up"
+                }
             }
         }
     }
