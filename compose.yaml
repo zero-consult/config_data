@@ -1,5 +1,6 @@
 services:
   people-frontend:
+    container_name: people-frontend
     image: docker-releases/people_frontend_development:1.0.27
     networks:
       - development
@@ -9,6 +10,7 @@ services:
     environment:
       VITE_PEOPLE_BACKEND_HOST: https://people-backend:8080
   people-backend:
+    container_name: people-backend
     image: docker-releases/people_backend_development:1.0.13
     networks:
       - development
@@ -22,6 +24,7 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
   postgres:
+    container_name: postgres
     image: postgres:latest
     networks:
       - development
