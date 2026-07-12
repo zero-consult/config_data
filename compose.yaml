@@ -1,7 +1,7 @@
 services:
   people-frontend:
     container_name: people-frontend
-    image: nexus:8081/docker-releases/people_frontend_development:1.0.28
+    image: nexus:8081/docker-releases/people_frontend_development:1.0.30
     networks:
       - development
     hostname: people-frontend
@@ -9,9 +9,23 @@ services:
       - 5100:5173
     environment:
       VITE_PEOPLE_BACKEND_HOST: http://localhost:4000
+      VITE_TIMESHEET_FRONTEND_URL: http://localhost:5001
+      VITE_PEOPLE_HOST: people-frontend
+  timesheet-frontend:
+    container_name: timesheet-frontend
+    image: nexus:8081/docker-releases/timesheet_frontend_development:1.0.2
+    networks:
+      - development
+    hostname: timesheet-frontend
+    ports:
+      - 5101:5174
+    environment:
+      VITE_PEOPLE_BACKEND_HOST: http://localhost:4000
+      VITE_PEOPLE_FRONTEND_URL: http://localhost:5000
+      VITE_TIMESHEET_HOST: timesheet-frontend
   people-backend:
     container_name: people-backend
-    image: nexus:8081/docker-releases/people_backend_development:1.0.15
+    image: nexus:8081/docker-releases/people_backend_development:1.0.16
     networks:
       - development
     hostname: people-backend
