@@ -30,6 +30,8 @@ services:
       - development
     shm_size: 128mb
     hostname: postgres
+    ports:
+      - 5432:5432
     volumes:
       - ./postgresql:/var/lib/postgresql/
     environment:
