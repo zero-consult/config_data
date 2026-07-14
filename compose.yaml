@@ -61,7 +61,7 @@ services:
       POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-      PEOPLE_BACKEND_HOST: http://people-backend:8080/
+      PEOPLE_BACKEND_HOST: http://people-backend:8080
     labels:
       - "traefik.http.routers.timesheet-backend.rule=Host(`timesheet-backend.localhost`)"
       - "traefik.http.services.timesheet-backend.loadbalancer.server.port=8081"
