@@ -8,24 +8,29 @@ services:
     ports:
       - 5100:5173
     environment:
-      VITE_PEOPLE_BACKEND_HOST: http://localhost:4000
-      VITE_TIMESHEET_FRONTEND_URL: http://localhost:5101
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.localhost
+      VITE_TIMESHEET_FRONTEND_URL: http://timesheet.localhost
       VITE_PEOPLE_HOST: people-frontend
+    labels:
+      - "traefik.http.routers.people-frontend.rule=Host(`people.localhost`)"
   timesheet-frontend:
     container_name: timesheet-frontend
-    image: nexus:8081/docker-releases/timesheet_frontend_development:1.0.2
+    image: nexus:8081/docker-releases/timesheet_frontend_development:1.0.4
     networks:
       - development
     hostname: timesheet-frontend
     ports:
       - 5101:5174
     environment:
-      VITE_PEOPLE_BACKEND_HOST: http://localhost:4000
-      VITE_PEOPLE_FRONTEND_URL: http://localhost:5100
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.localhost
+      VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.localhost
+      VITE_PEOPLE_FRONTEND_URL: http://people.localhost
       VITE_TIMESHEET_HOST: timesheet-frontend
+    labels:
+      - "traefik.http.routers.timesheet-frontend.rule=Host(`timesheet.localhost`)"
   people-backend:
     container_name: people-backend
-    image: nexus:8081/docker-releases/people_backend_development:1.0.16
+    image: nexus:8081/docker-releases/people_backend_development:1.0.18
     networks:
       - development
     hostname: people-backend
@@ -37,21 +42,66 @@ services:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-  postgres:
-    container_name: postgres
+    labels:
+      - "traefik.http.routers.people-backend.rule=Host(`people-backend.localhost`)"
+  timesheet-backend:
+    container_name: timesheet-backend
+    image: nexus:8081/docker-releases/timesheet_backend_development:1.0.6
+    networks:
+      - development
+    hostname: timesheet-backend
+    ports:
+      - 4001:8080
+    environment:
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: 5433
+      POSTGRES_DB: people_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      PEOPLE_BACKEND_HOST: http://people-backend:4000/
+    labels:
+      - "traefik.http.routers.timesheet-backend.rule=Host(`timesheet-backend.localhost`)"
+  postgres-people:
+    container_name: postgres-people
     image: postgres:latest
     networks:
       - development
     shm_size: 128mb
-    hostname: postgres
+    hostname: postgres-people
     ports:
       - 5432:5432
     volumes:
-      - ./postgresql:/var/lib/postgresql/
+      - ./postgresql-people:/var/lib/postgresql/
     environment:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  postgres-timesheet:
+    container_name: postgres-timesheet
+    image: postgres:latest
+    networks:
+      - development
+    shm_size: 128mb
+    hostname: postgres-timesheet
+    ports:
+      - 5433:5432
+    volumes:
+      - ./postgresql-timesheet:/var/lib/postgresql/
+    environment:
+      POSTGRES_DB: timesheet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  traefik:
+    image: traefik:v3.7
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--entrypoints.web.address=:80"
+    ports:
+      - "80:80"
+      - "9000:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 networks:
   development:
     driver: bridge
