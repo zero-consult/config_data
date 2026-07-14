@@ -101,6 +101,8 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--entrypoints.web.address=:80"
+    networks:
+      - development
     ports:
       - "80:80"
       - "9000:8080"
