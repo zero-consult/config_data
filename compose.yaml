@@ -57,8 +57,8 @@ services:
       - 4001:8080
     environment:
       POSTGRES_HOST: postgres-timesheet
-      POSTGRES_PORT: 5432
-      POSTGRES_DB: people_db
+      POSTGRES_PORT: 5433
+      POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       PEOPLE_BACKEND_HOST: http://people-backend:4000/
