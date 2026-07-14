@@ -13,6 +13,7 @@ services:
       VITE_PEOPLE_HOST: people-frontend
     labels:
       - "traefik.http.routers.people-frontend.rule=Host(`people.localhost`)"
+      - "traefik.http.services.people-frontend.loadbalancer.server.port=5100"
   timesheet-frontend:
     container_name: timesheet-frontend
     image: nexus:8081/docker-releases/timesheet_frontend_development:1.0.4
@@ -28,6 +29,7 @@ services:
       VITE_TIMESHEET_HOST: timesheet-frontend
     labels:
       - "traefik.http.routers.timesheet-frontend.rule=Host(`timesheet.localhost`)"
+      - "traefik.http.services.timesheet-frontend.loadbalancer.server.port=5101"
   people-backend:
     container_name: people-backend
     image: nexus:8081/docker-releases/people_backend_development:1.0.18
@@ -44,6 +46,7 @@ services:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     labels:
       - "traefik.http.routers.people-backend.rule=Host(`people-backend.localhost`)"
+      - "traefik.http.services.people-backend.loadbalancer.server.port=4000"
   timesheet-backend:
     container_name: timesheet-backend
     image: nexus:8081/docker-releases/timesheet_backend_development:1.0.6
@@ -61,6 +64,7 @@ services:
       PEOPLE_BACKEND_HOST: http://people-backend:4000/
     labels:
       - "traefik.http.routers.timesheet-backend.rule=Host(`timesheet-backend.localhost`)"
+      - "traefik.http.services.timesheet-backend.loadbalancer.server.port=4001"
   postgres-people:
     container_name: postgres-people
     image: postgres:latest
