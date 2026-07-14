@@ -39,7 +39,7 @@ services:
     ports:
       - 4000:8080
     environment:
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres-people
       POSTGRES_PORT: 5432
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
@@ -56,7 +56,7 @@ services:
     ports:
       - 4001:8080
     environment:
-      POSTGRES_HOST: postgres
+      POSTGRES_HOST: postgres-timesheet
       POSTGRES_PORT: 5433
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
