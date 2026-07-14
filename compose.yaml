@@ -54,7 +54,7 @@ services:
       - development
     hostname: timesheet-backend
     ports:
-      - 4001:8080
+      - 4001:8081
     environment:
       POSTGRES_HOST: postgres-timesheet
       POSTGRES_PORT: 5432
@@ -64,7 +64,7 @@ services:
       PEOPLE_BACKEND_HOST: http://people-backend:4000/
     labels:
       - "traefik.http.routers.timesheet-backend.rule=Host(`timesheet-backend.localhost`)"
-      - "traefik.http.services.timesheet-backend.loadbalancer.server.port=8080"
+      - "traefik.http.services.timesheet-backend.loadbalancer.server.port=8081"
   postgres-people:
     container_name: postgres-people
     image: postgres:latest
