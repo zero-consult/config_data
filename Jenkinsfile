@@ -23,5 +23,16 @@ pipeline {
                 }
             }
         }
+        stage("Undeploy reverse proxy") {
+            steps {
+                sh "docker compose -f traefik.yaml down"
+            }
+        }
+        stage("Undeploy reverse proxy") {
+            steps {
+                sh "docker compose -f traefik.yaml up"
+            }
+        }
+
     }
 }
