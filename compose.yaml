@@ -200,7 +200,7 @@ services:
       - internal
     hostname: people-frontend-dev
     ports:
-      - 5100:5173
+      - 5300:5173
     environment:
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
       VITE_TIMESHEET_FRONTEND_URL: http://timesheet.dev.localhost
@@ -215,7 +215,7 @@ services:
       - internal
     hostname: timesheet-frontend-dev
     ports:
-      - 5101:5174
+      - 5301:5174
     environment:
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
       VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.dev.localhost
@@ -231,7 +231,7 @@ services:
       - internal
     hostname: people-backend-dev
     ports:
-      - 4000:8080
+      - 4200:8080
     environment:
       POSTGRES_HOST: postgres-people-dev
       POSTGRES_PORT: 5432
@@ -248,7 +248,7 @@ services:
       - internal
     hostname: timesheet-backend-dev
     ports:
-      - 4001:8081
+      - 4201:8081
     environment:
       POSTGRES_HOST: postgres-timesheet-dev
       POSTGRES_PORT: 5432
@@ -267,7 +267,7 @@ services:
     shm_size: 128mb
     hostname: postgres-people-dev
     ports:
-      - 5432:5432
+      - 5632:5432
     volumes:
       - ./postgresql-people-dev:/var/lib/postgresql/
     environment:
@@ -282,7 +282,7 @@ services:
     shm_size: 128mb
     hostname: postgres-timesheet-dev
     ports:
-      - 5433:5432
+      - 5633:5432
     volumes:
       - ./postgresql-timesheet-dev:/var/lib/postgresql/
     environment:
