@@ -44,6 +44,9 @@ services:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    depends_on:
+      postgres-people:
+        condition: service_healthy
     labels:
       - "traefik.http.routers.people-backend.rule=Host(`people-backend.localhost`)"
       - "traefik.http.services.people-backend.loadbalancer.server.port=8080"
@@ -62,6 +65,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       PEOPLE_BACKEND_HOST: http://people-backend:8080
+    depends_on:
+      postgres-timesheet:
+        condition: service_healthy
     labels:
       - "traefik.http.routers.timesheet-backend.rule=Host(`timesheet-backend.localhost`)"
       - "traefik.http.services.timesheet-backend.loadbalancer.server.port=8081"
@@ -80,6 +86,11 @@ services:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   postgres-timesheet:
     container_name: postgres-timesheet
     image: postgres:latest
@@ -95,6 +106,11 @@ services:
       POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   people-frontend-tst:
     container_name: people-frontend-tst
@@ -141,6 +157,9 @@ services:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    depends_on:
+      postgres-people-tst:
+        condition: service_healthy
     labels:
       - "traefik.http.routers.people-backend-tst.rule=Host(`people-backend.tst.localhost`)"
       - "traefik.http.services.people-backend-tst.loadbalancer.server.port=8080"
@@ -159,6 +178,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       PEOPLE_BACKEND_HOST: http://people-backend-tst:8080
+    depends_on:
+      postgres-timesheet-tst:
+        condition: service_healthy
     labels:
       - "traefik.http.routers.timesheet-backend-tst.rule=Host(`timesheet-backend.tst.localhost`)"
       - "traefik.http.services.timesheet-backend-tst.loadbalancer.server.port=8081"
@@ -177,6 +199,11 @@ services:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   postgres-timesheet-tst:
     container_name: postgres-timesheet-tst
     image: postgres:latest
@@ -192,6 +219,11 @@ services:
       POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   people-frontend-dev:
     container_name: people-frontend-dev
@@ -238,6 +270,9 @@ services:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    depends_on:
+      postgres-people-dev:
+        condition: service_healthy
     labels:
       - "traefik.http.routers.people-backend-dev.rule=Host(`people-backend.dev.localhost`)"
       - "traefik.http.services.people-backend-dev.loadbalancer.server.port=8080"
@@ -256,6 +291,9 @@ services:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       PEOPLE_BACKEND_HOST: http://people-backend-dev:8080
+    depends_on:
+      postgres-timesheet-dev:
+        condition: service_healthy
     labels:
       - "traefik.http.routers.timesheet-backend-dev.rule=Host(`timesheet-backend.dev.localhost`)"
       - "traefik.http.services.timesheet-backend-dev.loadbalancer.server.port=8081"
@@ -274,6 +312,11 @@ services:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
   postgres-timesheet-dev:
     container_name: postgres-timesheet-dev
     image: postgres:latest
@@ -289,6 +332,11 @@ services:
       POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   traefik:
     image: traefik:v3.7
