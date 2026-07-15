@@ -16,3 +16,10 @@ services:
       - "9000:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
+networks:
+  development:
+    driver: bridge
+  testing:
+    driver: bridge
+  production:
+    driver: bridge
