@@ -5,21 +5,15 @@ services:
       - "--api.insecure=true"
       - "--providers.docker=true"
       - "--providers.docker.useBindPortIP=true"
-      - "--providers.docker.network=development"
+      - "--providers.docker.network=internal"
       - "--entrypoints.web.address=:80"
     networks:
-      - development
-      - testing
-      - production
+      - internal
     ports:
       - "80:80"
       - "9000:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
 networks:
-  development:
-    driver: bridge
-  testing:
-    driver: bridge
-  production:
+  internal:
     driver: bridge

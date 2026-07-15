@@ -30,7 +30,7 @@ pipeline {
         }
         stage("Deploy reverse proxy") {
             steps {
-                sh "docker compose -f traefik.yaml up"
+                sh "docker compose -f traefik.yaml up -d"
             }
         }
 
