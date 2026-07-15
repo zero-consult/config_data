@@ -1,5 +1,102 @@
 services:
   people-frontend:
+    container_name: people-frontend
+    image: nexus:8081/docker-releases/people_frontend:1.0.31
+    networks:
+      - internal
+    hostname: people-frontend
+    ports:
+      - 5100:5173
+    environment:
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.localhost
+      VITE_TIMESHEET_FRONTEND_URL: http://timesheet.localhost
+      VITE_PEOPLE_HOST: people-frontend
+    labels:
+      - "traefik.http.routers.people-frontend.rule=Host(`people.localhost`)"
+      - "traefik.http.services.people-frontend.loadbalancer.server.port=5173"
+  timesheet-frontend:
+    container_name: timesheet-frontend
+    image: nexus:8081/docker-releases/timesheet_frontend:1.0.6
+    networks:
+      - internal
+    hostname: timesheet-frontend
+    ports:
+      - 5101:5174
+    environment:
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.localhost
+      VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.localhost
+      VITE_PEOPLE_FRONTEND_URL: http://people.localhost
+      VITE_TIMESHEET_HOST: timesheet-frontend
+    labels:
+      - "traefik.http.routers.timesheet-frontend.rule=Host(`timesheet.localhost`)"
+      - "traefik.http.services.timesheet-frontend.loadbalancer.server.port=5174"
+  people-backend:
+    container_name: people-backend
+    image: nexus:8081/docker-releases/people_backend:1.0.20
+    networks:
+      - internal
+    hostname: people-backend
+    ports:
+      - 4000:8080
+    environment:
+      POSTGRES_HOST: postgres-people
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: people_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    labels:
+      - "traefik.http.routers.people-backend.rule=Host(`people-backend.localhost`)"
+      - "traefik.http.services.people-backend.loadbalancer.server.port=8080"
+  timesheet-backend:
+    container_name: timesheet-backend
+    image: nexus:8081/docker-releases/timesheet_backend:1.0.10
+    networks:
+      - internal
+    hostname: timesheet-backend
+    ports:
+      - 4001:8081
+    environment:
+      POSTGRES_HOST: postgres-timesheet
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: timesheet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      PEOPLE_BACKEND_HOST: http://people-backend:8080
+    labels:
+      - "traefik.http.routers.timesheet-backend.rule=Host(`timesheet-backend.localhost`)"
+      - "traefik.http.services.timesheet-backend.loadbalancer.server.port=8081"
+  postgres-people:
+    container_name: postgres-people
+    image: postgres:latest
+    networks:
+      - internal
+    shm_size: 128mb
+    hostname: postgres-people
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgresql-people:/var/lib/postgresql/
+    environment:
+      POSTGRES_DB: people_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  postgres-timesheet:
+    container_name: postgres-timesheet
+    image: postgres:latest
+    networks:
+      - internal
+    shm_size: 128mb
+    hostname: postgres-timesheet
+    ports:
+      - 5433:5432
+    volumes:
+      - ./postgresql-timesheet:/var/lib/postgresql/
+    environment:
+      POSTGRES_DB: timesheet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+
+  people-frontend-tst:
     container_name: people-frontend-tst
     image: nexus:8081/docker-releases/people_frontend_testing:1.0.31
     networks:
@@ -14,7 +111,7 @@ services:
     labels:
       - "traefik.http.routers.people-frontend-tst.rule=Host(`people.tst.localhost`)"
       - "traefik.http.services.people-frontend-tst.loadbalancer.server.port=5173"
-  timesheet-frontend:
+  timesheet-frontend-tst:
     container_name: timesheet-frontend-tst
     image: nexus:8081/docker-releases/timesheet_frontend_testing:1.0.6
     networks:
@@ -30,7 +127,7 @@ services:
     labels:
       - "traefik.http.routers.timesheet-frontend-tst.rule=Host(`timesheet.tst.localhost`)"
       - "traefik.http.services.timesheet-frontend-tst.loadbalancer.server.port=5174"
-  people-backend:
+  people-backend-tst:
     container_name: people-backend-tst
     image: nexus:8081/docker-releases/people_backend_testing:1.0.20
     networks:
@@ -47,7 +144,7 @@ services:
     labels:
       - "traefik.http.routers.people-backend-tst.rule=Host(`people-backend.tst.localhost`)"
       - "traefik.http.services.people-backend-tst.loadbalancer.server.port=8080"
-  timesheet-backend:
+  timesheet-backend-tst:
     container_name: timesheet-backend-tst
     image: nexus:8081/docker-releases/timesheet_backend_testing:1.0.10
     networks:
@@ -65,7 +162,7 @@ services:
     labels:
       - "traefik.http.routers.timesheet-backend-tst.rule=Host(`timesheet-backend.tst.localhost`)"
       - "traefik.http.services.timesheet-backend-tst.loadbalancer.server.port=8081"
-  postgres-people:
+  postgres-people-tst:
     container_name: postgres-people-tst
     image: postgres:latest
     networks:
@@ -75,12 +172,12 @@ services:
     ports:
       - 5532:5432
     volumes:
-      - ./postgresql-people:/var/lib/postgresql/
+      - ./postgresql-people-tst:/var/lib/postgresql/
     environment:
       POSTGRES_DB: people_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-  postgres-timesheet:
+  postgres-timesheet-tst:
     container_name: postgres-timesheet-tst
     image: postgres:latest
     networks:
@@ -90,11 +187,124 @@ services:
     ports:
       - 5533:5432
     volumes:
-      - ./postgresql-timesheet:/var/lib/postgresql/
+      - ./postgresql-timesheet-tst:/var/lib/postgresql/
     environment:
       POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+
+  people-frontend-dev:
+    container_name: people-frontend-dev
+    image: nexus:8081/docker-releases/people_frontend_development:1.0.31
+    networks:
+      - internal
+    hostname: people-frontend-dev
+    ports:
+      - 5100:5173
+    environment:
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
+      VITE_TIMESHEET_FRONTEND_URL: http://timesheet.dev.localhost
+      VITE_PEOPLE_HOST: people-frontend-dev
+    labels:
+      - "traefik.http.routers.people-frontend-dev.rule=Host(`people.dev.localhost`)"
+      - "traefik.http.services.people-frontend-dev.loadbalancer.server.port=5173"
+  timesheet-frontend-dev:
+    container_name: timesheet-frontend-dev
+    image: nexus:8081/docker-releases/timesheet_frontend_development:1.0.6
+    networks:
+      - internal
+    hostname: timesheet-frontend-dev
+    ports:
+      - 5101:5174
+    environment:
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
+      VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.dev.localhost
+      VITE_PEOPLE_FRONTEND_URL: http://people.dev.localhost
+      VITE_TIMESHEET_HOST: timesheet-frontend-dev
+    labels:
+      - "traefik.http.routers.timesheet-frontend-dev.rule=Host(`timesheet.dev.localhost`)"
+      - "traefik.http.services.timesheet-frontend-dev.loadbalancer.server.port=5174"
+  people-backend-dev:
+    container_name: people-backend-dev
+    image: nexus:8081/docker-releases/people_backend_development:1.0.20
+    networks:
+      - internal
+    hostname: people-backend-dev
+    ports:
+      - 4000:8080
+    environment:
+      POSTGRES_HOST: postgres-people-dev
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: people_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    labels:
+      - "traefik.http.routers.people-backend-dev.rule=Host(`people-backend.dev.localhost`)"
+      - "traefik.http.services.people-backend-dev.loadbalancer.server.port=8080"
+  timesheet-backend-dev:
+    container_name: timesheet-backend-dev
+    image: nexus:8081/docker-releases/timesheet_backend_development:1.0.10
+    networks:
+      - internal
+    hostname: timesheet-backend-dev
+    ports:
+      - 4001:8081
+    environment:
+      POSTGRES_HOST: postgres-timesheet-dev
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: timesheet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      PEOPLE_BACKEND_HOST: http://people-backend-dev:8080
+    labels:
+      - "traefik.http.routers.timesheet-backend-dev.rule=Host(`timesheet-backend.dev.localhost`)"
+      - "traefik.http.services.timesheet-backend-dev.loadbalancer.server.port=8081"
+  postgres-people-dev:
+    container_name: postgres-people-dev
+    image: postgres:latest
+    networks:
+      - internal
+    shm_size: 128mb
+    hostname: postgres-people-dev
+    ports:
+      - 5432:5432
+    volumes:
+      - ./postgresql-people-dev:/var/lib/postgresql/
+    environment:
+      POSTGRES_DB: people_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  postgres-timesheet-dev:
+    container_name: postgres-timesheet-dev
+    image: postgres:latest
+    networks:
+      - internal
+    shm_size: 128mb
+    hostname: postgres-timesheet-dev
+    ports:
+      - 5433:5432
+    volumes:
+      - ./postgresql-timesheet-dev:/var/lib/postgresql/
+    environment:
+      POSTGRES_DB: timesheet_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+
+  traefik:
+    image: traefik:v3.7
+    command:
+      - "--api.insecure=true"
+      - "--providers.docker=true"
+      - "--providers.docker.useBindPortIP=true"
+      - "--providers.docker.network=internal"
+      - "--entrypoints.web.address=:80"
+    networks:
+      - internal
+    ports:
+      - "80:80"
+      - "9000:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
 
 networks:
   internal:
