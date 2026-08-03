@@ -1,7 +1,7 @@
 services:
   people-frontend:
     container_name: people-frontend
-    image: nexus:8081/docker-releases/people_frontend:1.1.6
+    image: nexus:8081/docker-releases/people_frontend:1.2.4
     networks:
       - internal
     hostname: people-frontend
@@ -10,29 +10,50 @@ services:
     environment:
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.localhost
       VITE_TIMESHEET_FRONTEND_URL: http://timesheet.localhost
+      VITE_INVOICES_FRONTEND_URL: http://invoices.localhost
       VITE_PEOPLE_HOST: people-frontend
     labels:
       - "traefik.http.routers.people-frontend.rule=Host(`people.localhost`)"
       - "traefik.http.services.people-frontend.loadbalancer.server.port=5173"
   timesheet-frontend:
     container_name: timesheet-frontend
-    image: nexus:8081/docker-releases/timesheet_frontend:1.1.4
+    image: nexus:8081/docker-releases/timesheet_frontend:1.2.2
     networks:
       - internal
     hostname: timesheet-frontend
     ports:
       - 5101:5174
     environment:
+      VITE_INVOICES_BACKEND_HOST: http://invoices-backend.localhost
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.localhost
       VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.localhost
       VITE_PEOPLE_FRONTEND_URL: http://people.localhost
+      VITE_INVOICES_FRONTEND_URL: http://invoices.localhost
       VITE_TIMESHEET_HOST: timesheet-frontend
     labels:
       - "traefik.http.routers.timesheet-frontend.rule=Host(`timesheet.localhost`)"
       - "traefik.http.services.timesheet-frontend.loadbalancer.server.port=5174"
+  invoices-frontend:
+    container_name: invoices-frontend
+    image: nexus:8081/docker-releases/invoices_frontend:1.0.1
+    networks:
+      - internal
+    hostname: invoices-frontend
+    ports:
+      - 5102:5175
+    environment:
+      VITE_INVOICES_BACKEND_HOST: http://invoices-backend.localhost
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.localhost
+      VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.localhost
+      VITE_PEOPLE_FRONTEND_URL: http://people.localhost
+      VITE_TIMESHEET_FRONTEND_URL: http://timesheet.localhost
+      VITE_INVOICES_HOST: invoices-frontend
+    labels:
+      - "traefik.http.routers.invoices-frontend.rule=Host(`invoices.localhost`)"
+      - "traefik.http.services.invoices-frontend.loadbalancer.server.port=5175"
   people-backend:
     container_name: people-backend
-    image: nexus:8081/docker-releases/people_backend:1.1.0
+    image: nexus:8081/docker-releases/people_backend:1.2.1
     networks:
       - internal
     hostname: people-backend
@@ -52,7 +73,7 @@ services:
       - "traefik.http.services.people-backend.loadbalancer.server.port=8080"
   timesheet-backend:
     container_name: timesheet-backend
-    image: nexus:8081/docker-releases/timesheet_backend:1.1.0
+    image: nexus:8081/docker-releases/timesheet_backend:1.2.1
     networks:
       - internal
     hostname: timesheet-backend
@@ -64,6 +85,7 @@ services:
       POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      INVOICES_BACKEND_HOST: http://invoices-backend:8082
       PEOPLE_BACKEND_HOST: http://people-backend:8080
     depends_on:
       postgres-timesheet:
@@ -71,6 +93,28 @@ services:
     labels:
       - "traefik.http.routers.timesheet-backend.rule=Host(`timesheet-backend.localhost`)"
       - "traefik.http.services.timesheet-backend.loadbalancer.server.port=8081"
+  invoices-backend:
+    container_name: invoices-backend
+    image: nexus:8081/docker-releases/invoices_backend:1.0.0
+    networks:
+      - internal
+    hostname: invoices-backend
+    ports:
+      - 4002:8082
+    environment:
+      POSTGRES_HOST: postgres-invoices
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: invoices_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      TIMESHEET_BACKEND_HOST: http://timesheet-backend:8081
+      PEOPLE_BACKEND_HOST: http://people-backend:8080
+    depends_on:
+      postgres-invoices:
+        condition: service_healthy
+    labels:
+      - "traefik.http.routers.invoices-backend.rule=Host(`invoices-backend.localhost`)"
+      - "traefik.http.services.invoices-backend.loadbalancer.server.port=8082"
   postgres-people:
     container_name: postgres-people
     image: postgres:latest
@@ -111,123 +155,30 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-#  people-frontend-tst:
-#    container_name: people-frontend-tst
-#    image: nexus:8081/docker-releases/people_frontend_testing:1.1.6
-#    networks:
-#      - internal
-#    hostname: people-frontend-tst
-#    ports:
-#      - 5200:5173
-#    environment:
-#      VITE_PEOPLE_BACKEND_HOST: http://people-backend.tst.localhost
-#      VITE_TIMESHEET_FRONTEND_URL: http://timesheet.tst.localhost
-#      VITE_PEOPLE_HOST: people-frontend-tst
-#    labels:
-#      - "traefik.http.routers.people-frontend-tst.rule=Host(`people.tst.localhost`)"
-#      - "traefik.http.services.people-frontend-tst.loadbalancer.server.port=5173"
-#  timesheet-frontend-tst:
-#    container_name: timesheet-frontend-tst
-#    image: nexus:8081/docker-releases/timesheet_frontend_testing:1.1.4
-#    networks:
-#      - internal
-#    hostname: timesheet-frontend-tst
-#    ports:
-#      - 5201:5174
-#    environment:
-#      VITE_PEOPLE_BACKEND_HOST: http://people-backend.tst.localhost
-#      VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.tst.localhost
-#      VITE_PEOPLE_FRONTEND_URL: http://people.tst.localhost
-#      VITE_TIMESHEET_HOST: timesheet-frontend-tst
-#    labels:
-#      - "traefik.http.routers.timesheet-frontend-tst.rule=Host(`timesheet.tst.localhost`)"
-#      - "traefik.http.services.timesheet-frontend-tst.loadbalancer.server.port=5174"
-#  people-backend-tst:
-#    container_name: people-backend-tst
-#    image: nexus:8081/docker-releases/people_backend_testing:1.1.0
-#    networks:
-#      - internal
-#    hostname: people-backend-tst
-#    ports:
-#      - 4100:8080
-#    environment:
-#      POSTGRES_HOST: postgres-people-tst
-#      POSTGRES_PORT: 5432
-#      POSTGRES_DB: people_db
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-#    depends_on:
-#      postgres-people-tst:
-#        condition: service_healthy
-#    labels:
-#      - "traefik.http.routers.people-backend-tst.rule=Host(`people-backend.tst.localhost`)"
-#      - "traefik.http.services.people-backend-tst.loadbalancer.server.port=8080"
-#  timesheet-backend-tst:
-#    container_name: timesheet-backend-tst
-#    image: nexus:8081/docker-releases/timesheet_backend_testing:1.1.0
-#    networks:
-#      - internal
-#    hostname: timesheet-backend-tst
-#    ports:
-#      - 4101:8081
-#    environment:
-#      POSTGRES_HOST: postgres-timesheet-tst
-#      POSTGRES_PORT: 5432
-#      POSTGRES_DB: timesheet_db
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-#      PEOPLE_BACKEND_HOST: http://people-backend-tst:8080
-#    depends_on:
-#      postgres-timesheet-tst:
-#        condition: service_healthy
-#    labels:
-#      - "traefik.http.routers.timesheet-backend-tst.rule=Host(`timesheet-backend.tst.localhost`)"
-#      - "traefik.http.services.timesheet-backend-tst.loadbalancer.server.port=8081"
-#  postgres-people-tst:
-#    container_name: postgres-people-tst
-#    image: postgres:latest
-#    networks:
-#      - internal
-#    shm_size: 128mb
-#    hostname: postgres-people-tst
-#    ports:
-#      - 5532:5432
-#    volumes:
-#      - ./postgresql-people-tst:/var/lib/postgresql/
-#    environment:
-#      POSTGRES_DB: people_db
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-#      interval: 5s
-#      timeout: 5s
-#      retries: 5
-#  postgres-timesheet-tst:
-#    container_name: postgres-timesheet-tst
-#    image: postgres:latest
-#    networks:
-#      - internal
-#    shm_size: 128mb
-#    hostname: postgres-timesheet-tst
-#    ports:
-#      - 5533:5432
-#    volumes:
-#      - ./postgresql-timesheet-tst:/var/lib/postgresql/
-#    environment:
-#      POSTGRES_DB: timesheet_db
-#      POSTGRES_USER: postgres
-#      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
-#    healthcheck:
-#      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
-#      interval: 5s
-#      timeout: 5s
-#      retries: 5
+  postgres-invoices:
+    container_name: postgres-invoices
+    image: postgres:latest
+    networks:
+      - internal
+    shm_size: 128mb
+    hostname: postgres-invoices
+    ports:
+      - 5434:5432
+    volumes:
+      - ./postgresql-invoices:/var/lib/postgresql/
+    environment:
+      POSTGRES_DB: invoices_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   people-frontend-dev:
     container_name: people-frontend-dev
-    image: nexus:8081/docker-releases/people_frontend_development:1.1.6
+    image: nexus:8081/docker-releases/people_frontend_development:1.2.4
     networks:
       - internal
     hostname: people-frontend-dev
@@ -236,29 +187,50 @@ services:
     environment:
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
       VITE_TIMESHEET_FRONTEND_URL: http://timesheet.dev.localhost
+      VITE_INVOICES_FRONTEND_URL: http://invoices.dev.localhost
       VITE_PEOPLE_HOST: people-frontend-dev
     labels:
       - "traefik.http.routers.people-frontend-dev.rule=Host(`people.dev.localhost`)"
       - "traefik.http.services.people-frontend-dev.loadbalancer.server.port=5173"
   timesheet-frontend-dev:
     container_name: timesheet-frontend-dev
-    image: nexus:8081/docker-releases/timesheet_frontend_development:1.1.4
+    image: nexus:8081/docker-releases/timesheet_frontend_development:1.2.2
     networks:
       - internal
     hostname: timesheet-frontend-dev
     ports:
       - 5301:5174
     environment:
+      VITE_INVOICES_BACKEND_HOST: http://invoices-backend.dev.localhost
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
       VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.dev.localhost
       VITE_PEOPLE_FRONTEND_URL: http://people.dev.localhost
+      VITE_INVOICES_FRONTEND_URL: http://invoices.dev.localhost
       VITE_TIMESHEET_HOST: timesheet-frontend-dev
     labels:
       - "traefik.http.routers.timesheet-frontend-dev.rule=Host(`timesheet.dev.localhost`)"
       - "traefik.http.services.timesheet-frontend-dev.loadbalancer.server.port=5174"
+  invoices-frontend-dev:
+    container_name: invoices-frontend-dev
+    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.1
+    networks:
+      - internal
+    hostname: invoices-frontend-dev
+    ports:
+      - 5302:5175
+    environment:
+      VITE_INVOICES_BACKEND_HOST: http://invoices-backend.dev.localhost
+      VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
+      VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.dev.localhost
+      VITE_PEOPLE_FRONTEND_URL: http://people.dev.localhost
+      VITE_TIMESHEET_FRONTEND_URL: http://timesheet.dev.localhost
+      VITE_INVOICES_HOST: invoices-frontend-dev
+    labels:
+      - "traefik.http.routers.invoices-frontend.rule=Host(`invoices.localhost`)"
+      - "traefik.http.services.invoices-frontend.loadbalancer.server.port=5175"
   people-backend-dev:
     container_name: people-backend-dev
-    image: nexus:8081/docker-releases/people_backend_development:1.1.0
+    image: nexus:8081/docker-releases/people_backend_development:1.2.1
     networks:
       - internal
     hostname: people-backend-dev
@@ -278,7 +250,7 @@ services:
       - "traefik.http.services.people-backend-dev.loadbalancer.server.port=8080"
   timesheet-backend-dev:
     container_name: timesheet-backend-dev
-    image: nexus:8081/docker-releases/timesheet_backend_development:1.1.0
+    image: nexus:8081/docker-releases/timesheet_backend_development:1.2.1
     networks:
       - internal
     hostname: timesheet-backend-dev
@@ -290,6 +262,7 @@ services:
       POSTGRES_DB: timesheet_db
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      INVOICES_BACKEND_HOST: http://invoices-backend-dev:8082
       PEOPLE_BACKEND_HOST: http://people-backend-dev:8080
     depends_on:
       postgres-timesheet-dev:
@@ -297,6 +270,28 @@ services:
     labels:
       - "traefik.http.routers.timesheet-backend-dev.rule=Host(`timesheet-backend.dev.localhost`)"
       - "traefik.http.services.timesheet-backend-dev.loadbalancer.server.port=8081"
+  invoices-backend-dev:
+    container_name: invoices-backend-dev
+    image: nexus:8081/docker-releases/invoices_backend_development:1.0.0
+    networks:
+      - internal
+    hostname: invoices-backend-dev
+    ports:
+      - 4202:8082
+    environment:
+      POSTGRES_HOST: postgres-invoices-dev
+      POSTGRES_PORT: 5432
+      POSTGRES_DB: invoices_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+      TIMESHEET_BACKEND_HOST: http://timesheet-backend-dev:8081
+      PEOPLE_BACKEND_HOST: http://people-backend-dev:8080
+    depends_on:
+      postgres-invoices-dev:
+        condition: service_healthy
+    labels:
+      - "traefik.http.routers.invoices-backend.rule=Host(`invoices-backend.dev.localhost`)"
+      - "traefik.http.services.invoices-backend.loadbalancer.server.port=8082"
   postgres-people-dev:
     container_name: postgres-people-dev
     image: postgres:latest
@@ -334,6 +329,26 @@ services:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+  postgres-invoices-dev:
+    container_name: postgres-invoices-dev
+    image: postgres:latest
+    networks:
+      - internal
+    shm_size: 128mb
+    hostname: postgres-invoices-dev
+    ports:
+      - 5634:5432
+    volumes:
+      - ./postgresql-invoices-dev:/var/lib/postgresql/
+    environment:
+      POSTGRES_DB: invoices_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres" ]
       interval: 5s
       timeout: 5s
       retries: 5
