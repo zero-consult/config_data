@@ -212,7 +212,7 @@ services:
       - "traefik.http.services.timesheet-frontend-dev.loadbalancer.server.port=5174"
   invoices-frontend-dev:
     container_name: invoices-frontend-dev
-    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.1
+    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.3
     networks:
       - internal
     hostname: invoices-frontend-dev
@@ -272,7 +272,7 @@ services:
       - "traefik.http.services.timesheet-backend-dev.loadbalancer.server.port=8081"
   invoices-backend-dev:
     container_name: invoices-backend-dev
-    image: nexus:8081/docker-releases/invoices_backend_development:1.0.0
+    image: nexus:8081/docker-releases/invoices_backend_development:1.0.1
     networks:
       - internal
     hostname: invoices-backend-dev
