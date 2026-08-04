@@ -272,12 +272,14 @@ services:
       - "traefik.http.services.timesheet-backend-dev.loadbalancer.server.port=8081"
   invoices-backend-dev:
     container_name: invoices-backend-dev
-    image: nexus:8081/docker-releases/invoices_backend_development:1.0.2
+    image: nexus:8081/docker-releases/invoices_backend_development:1.0.3
     networks:
       - internal
     hostname: invoices-backend-dev
     ports:
       - 4202:8082
+    volumes:
+      - ./invoices-dev:/var/invoices
     environment:
       POSTGRES_HOST: postgres-invoices-dev
       POSTGRES_PORT: 5432
@@ -286,6 +288,7 @@ services:
       POSTGRES_PASSWORD: $POSTGRES_PASSWORD
       TIMESHEET_BACKEND_HOST: http://timesheet-backend-dev:8081
       PEOPLE_BACKEND_HOST: http://people-backend-dev:8080
+      INVOICES_DIR: /var/invoices
     depends_on:
       postgres-invoices-dev:
         condition: service_healthy
