@@ -178,7 +178,7 @@ services:
 
   people-frontend-dev:
     container_name: people-frontend-dev
-    image: nexus:8081/docker-releases/people_frontend_development:1.2.4
+    image: nexus:8081/docker-releases/people_frontend_development:1.2.5
     networks:
       - internal
     hostname: people-frontend-dev
@@ -194,7 +194,7 @@ services:
       - "traefik.http.services.people-frontend-dev.loadbalancer.server.port=5173"
   timesheet-frontend-dev:
     container_name: timesheet-frontend-dev
-    image: nexus:8081/docker-releases/timesheet_frontend_development:1.2.2
+    image: nexus:8081/docker-releases/timesheet_frontend_development:1.2.3
     networks:
       - internal
     hostname: timesheet-frontend-dev
@@ -212,7 +212,7 @@ services:
       - "traefik.http.services.timesheet-frontend-dev.loadbalancer.server.port=5174"
   invoices-frontend-dev:
     container_name: invoices-frontend-dev
-    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.5
+    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.6
     networks:
       - internal
     hostname: invoices-frontend-dev
@@ -230,7 +230,7 @@ services:
       - "traefik.http.services.invoices-frontend-dev.loadbalancer.server.port=5175"
   people-backend-dev:
     container_name: people-backend-dev
-    image: nexus:8081/docker-releases/people_backend_development:1.2.1
+    image: nexus:8081/docker-releases/people_backend_development:1.2.2
     networks:
       - internal
     hostname: people-backend-dev
@@ -250,7 +250,7 @@ services:
       - "traefik.http.services.people-backend-dev.loadbalancer.server.port=8080"
   timesheet-backend-dev:
     container_name: timesheet-backend-dev
-    image: nexus:8081/docker-releases/timesheet_backend_development:1.2.1
+    image: nexus:8081/docker-releases/timesheet_backend_development:1.2.2
     networks:
       - internal
     hostname: timesheet-backend-dev
@@ -272,7 +272,7 @@ services:
       - "traefik.http.services.timesheet-backend-dev.loadbalancer.server.port=8081"
   invoices-backend-dev:
     container_name: invoices-backend-dev
-    image: nexus:8081/docker-releases/invoices_backend_development:1.0.8
+    image: nexus:8081/docker-releases/invoices_backend_development:1.0.9
     networks:
       - internal
     hostname: invoices-backend-dev
