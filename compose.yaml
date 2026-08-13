@@ -178,7 +178,7 @@ services:
 
   people-frontend-dev:
     container_name: people-frontend-dev
-    image: nexus:8081/docker-releases/people_frontend_development:1.2.8
+    image: nexus:8081/docker-releases/people_frontend_development:1.2.9
     networks:
       - internal
     hostname: people-frontend-dev
@@ -214,7 +214,7 @@ services:
       - "traefik.http.services.timesheet-frontend-dev.loadbalancer.server.port=5174"
   invoices-frontend-dev:
     container_name: invoices-frontend-dev
-    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.8
+    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.9
     networks:
       - internal
     hostname: invoices-frontend-dev
