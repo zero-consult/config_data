@@ -190,7 +190,7 @@ services:
       VITE_INVOICES_FRONTEND_URL: http://dev.localhost/invoices
       VITE_PEOPLE_HOST: people-frontend-dev
     labels:
-      - "traefik.http.routers.people-frontend-dev.rule=Host(`dev.localhost`))"
+      - "traefik.http.routers.people-frontend-dev.rule=Host(`dev.localhost`)"
       - "traefik.http.routers.people-frontend-dev.priority=1"
       - "traefik.http.services.people-frontend-dev.loadbalancer.server.port=5173"
   timesheet-frontend-dev:
