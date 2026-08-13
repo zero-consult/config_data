@@ -178,7 +178,7 @@ services:
 
   people-frontend-dev:
     container_name: people-frontend-dev
-    image: nexus:8081/docker-releases/people_frontend_development:1.2.7
+    image: nexus:8081/docker-releases/people_frontend_development:1.2.8
     networks:
       - internal
     hostname: people-frontend-dev
@@ -186,15 +186,16 @@ services:
       - 5300:5173
     environment:
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
-      VITE_TIMESHEET_FRONTEND_URL: http://dev.localhost
-      VITE_INVOICES_FRONTEND_URL: http://dev.localhost
+      VITE_TIMESHEET_FRONTEND_URL: http://dev.localhost/timesheets
+      VITE_INVOICES_FRONTEND_URL: http://dev.localhost/invoices
       VITE_PEOPLE_HOST: people-frontend-dev
     labels:
-      - "traefik.http.routers.people-frontend-dev.rule=Host(`dev.localhost`) && (PathRegexp(`^/(employees|customers)`) || PathRegexp(`^/$`))"
+      - "traefik.http.routers.people-frontend-dev.rule=Host(`dev.localhost`))"
+      - "traefik.http.routers.people-frontend-dev.priority=1"
       - "traefik.http.services.people-frontend-dev.loadbalancer.server.port=5173"
   timesheet-frontend-dev:
     container_name: timesheet-frontend-dev
-    image: nexus:8081/docker-releases/timesheet_frontend_development:1.2.4
+    image: nexus:8081/docker-releases/timesheet_frontend_development:1.2.5
     networks:
       - internal
     hostname: timesheet-frontend-dev
@@ -204,15 +205,16 @@ services:
       VITE_INVOICES_BACKEND_HOST: http://invoices-backend.dev.localhost
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
       VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.dev.localhost
-      VITE_PEOPLE_FRONTEND_URL: http://dev.localhost
-      VITE_INVOICES_FRONTEND_URL: http://dev.localhost
+      VITE_PEOPLE_FRONTEND_URL: http://dev.localhost/people
+      VITE_INVOICES_FRONTEND_URL: http://dev.localhost/invoices
       VITE_TIMESHEET_HOST: timesheet-frontend-dev
     labels:
       - "traefik.http.routers.timesheet-frontend-dev.rule=Host(`dev.localhost`) && PathRegexp(`^/timesheets`)"
+      - "traefik.http.routers.timesheet-frontend-dev.priority=2"
       - "traefik.http.services.timesheet-frontend-dev.loadbalancer.server.port=5174"
   invoices-frontend-dev:
     container_name: invoices-frontend-dev
-    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.7
+    image: nexus:8081/docker-releases/invoices_frontend_development:1.0.8
     networks:
       - internal
     hostname: invoices-frontend-dev
@@ -222,11 +224,12 @@ services:
       VITE_INVOICES_BACKEND_HOST: http://invoices-backend.dev.localhost
       VITE_PEOPLE_BACKEND_HOST: http://people-backend.dev.localhost
       VITE_TIMESHEET_BACKEND_HOST: http://timesheet-backend.dev.localhost
-      VITE_PEOPLE_FRONTEND_URL: http://dev.localhost
-      VITE_TIMESHEET_FRONTEND_URL: http://dev.localhost
+      VITE_PEOPLE_FRONTEND_URL: http://dev.localhost/people
+      VITE_TIMESHEET_FRONTEND_URL: http://dev.localhost/timesheets
       VITE_INVOICES_HOST: invoices-frontend-dev
     labels:
-      - "traefik.http.routers.invoices-frontend-dev.rule=Host(`dev.localhost`) && PathRegexp(`^/(invoices|payslips)`)"
+      - "traefik.http.routers.invoices-frontend-dev.rule=Host(`dev.localhost`) && PathRegexp(`^/(invoices)`)"
+      - "traefik.http.routers.invoices-frontend-dev.priority=3"
       - "traefik.http.services.invoices-frontend-dev.loadbalancer.server.port=5175"
   people-backend-dev:
     container_name: people-backend-dev
