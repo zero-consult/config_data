@@ -195,7 +195,7 @@ services:
       - "traefik.http.services.people-frontend-dev.loadbalancer.server.port=5173"
   timesheet-frontend-dev:
     container_name: timesheet-frontend-dev
-    image: nexus:8081/docker-releases/timesheet_frontend_development:1.2.5
+    image: nexus:8081/docker-releases/timesheet_frontend_development:1.2.6
     networks:
       - internal
     hostname: timesheet-frontend-dev
