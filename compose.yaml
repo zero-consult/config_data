@@ -233,7 +233,7 @@ services:
       - "traefik.http.services.invoices-frontend-dev.loadbalancer.server.port=5175"
   people-backend-dev:
     container_name: people-backend-dev
-    image: nexus:8081/docker-releases/people_backend_development:1.2.3
+    image: nexus:8081/docker-releases/people_backend_development:1.2.4
     networks:
       - internal
     hostname: people-backend-dev
@@ -254,7 +254,7 @@ services:
       - "traefik.http.services.people-backend-dev.loadbalancer.server.port=8080"
   timesheet-backend-dev:
     container_name: timesheet-backend-dev
-    image: nexus:8081/docker-releases/timesheet_backend_development:1.2.3
+    image: nexus:8081/docker-releases/timesheet_backend_development:1.2.4
     networks:
       - internal
     hostname: timesheet-backend-dev
@@ -277,7 +277,7 @@ services:
       - "traefik.http.services.timesheet-backend-dev.loadbalancer.server.port=8081"
   invoices-backend-dev:
     container_name: invoices-backend-dev
-    image: nexus:8081/docker-releases/invoices_backend_development:1.0.12
+    image: nexus:8081/docker-releases/invoices_backend_development:1.0.13
     networks:
       - internal
     hostname: invoices-backend-dev
